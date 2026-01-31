@@ -1,30 +1,37 @@
-import java.sql.DriverManager
+import core.Database
+import core.DatabaseConfiguration
+import schema.Table
 
 fun main() {
-    val url = "jdbc:postgresql://ep-lively-mode-ag9j92dh-pooler.c-2.eu-central-1.aws.neon.tech:5432/neondb?sslmode=require"
-    val user = "neondb_owner"
-    val password = "npg_MIqDV6lkhGL9"
 
-    val connection = DriverManager.getConnection(url, user, password)
+    val orm = Database(object : DatabaseConfiguration {
+        override val url = "jdbc:postgresql://ep-lively-mode-ag9j92dh-pooler.c-2.eu-central-1.aws.neon.tech:5432/neondb?sslmode=require"
+        override val username: String = "neondb_owner"
+        override val password: String = "npg_MIqDV6lkhGL9"
+    })
 
-    // Get all columns from cars table
-    val statement = connection.createStatement()
-    val resultSet = statement.executeQuery("""
-        SELECT column_name, data_type, is_nullable
-        FROM information_schema.columns
-        WHERE table_name = 'cars'
-        ORDER BY ordinal_position
-    """)
+    val usersTableModel = object : Table("users") {
+        val id = integer("id").autoIncrement().primaryKey()
+        val username = varchar("username", 50)
+            .notNull()
+            .unique()
 
-    println("Columns in 'cars' table:")
-    while (resultSet.next()) {
-        val columnName = resultSet.getString("column_name")
-        val dataType = resultSet.getString("data_type")
-        val isNullable = resultSet.getString("is_nullable")
-        println("- $columnName ($dataType, nullable: $isNullable)")
+        val email = varchar("email", 255)
+            .notNull()
+            .unique(constraintName = "uq_users_email_custom")
+            .check("email LIKE '%@%'", constraintName = "chk_email_format")
+
+        val age = integer("age")
+            .nullable()
+            .check("age >= 0 AND age <= 150", "chk_age_range")
+
+        val status = varchar("status", 20)
+            .notNull()
+            .default("active")
+            .check("status IN ('active', 'inactive', 'banned')", "chk_status_values")
     }
 
-    resultSet.close()
-    statement.close()
-    connection.close()
+    println(usersTableModel)
+
+    orm.closeConnection()
 }
