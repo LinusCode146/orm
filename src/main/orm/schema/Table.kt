@@ -1,5 +1,6 @@
 package schema
 
+import schema.columns.BooleanColumn
 import schema.columns.IntegerColumn
 import schema.columns.TextColumn
 import schema.columns.VarcharColumn
@@ -21,6 +22,12 @@ abstract class Table(val tableName: String) {
 
     protected fun varchar(name: String, length: Int): VarcharColumn {
         val column = VarcharColumn(name, length)
+        _columns.add(column)
+        return column
+    }
+
+    protected fun boolean(name: String): BooleanColumn {
+        val column = BooleanColumn(name)
         _columns.add(column)
         return column
     }

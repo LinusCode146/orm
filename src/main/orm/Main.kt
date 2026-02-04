@@ -1,5 +1,7 @@
 import core.Database
 import core.DatabaseConfiguration
+import execution.QueryExecutor
+import query.SelectQuery
 import schema.Table
 
 fun main() {
@@ -10,28 +12,40 @@ fun main() {
         override val password: String = "npg_MIqDV6lkhGL9"
     })
 
-    val usersTableModel = object : Table("users") {
+    val executor = QueryExecutor { orm.getConnection() }
+
+    val carsModel = object : Table("cars") {
         val id = integer("id").autoIncrement().primaryKey()
-        val username = varchar("username", 50)
+        val make = varchar("make", 50)
             .notNull()
-            .unique()
 
-        val email = varchar("email", 255)
+        val model = varchar("email", 50)
             .notNull()
-            .unique(constraintName = "uq_users_email_custom")
-            .check("email LIKE '%@%'", constraintName = "chk_email_format")
+            .unique(constraintName = "car_model")
 
-        val age = integer("age")
+        val year = integer("age")
             .nullable()
-            .check("age >= 0 AND age <= 150", "chk_age_range")
+            .check("age >= 0 AND age <= 2027", "chk_year_range")
 
-        val status = varchar("status", 20)
+        val color = varchar("color", 30)
             .notNull()
             .default("active")
             .check("status IN ('active', 'inactive', 'banned')", "chk_status_values")
     }
+    println()
+    println(carsModel)
 
-    println(usersTableModel)
+    val selectQuery = SelectQuery(carsModel, executor)
+        .where { carsModel.id eq 1 }
+        .limit(1)
+
+    val (selectSql, selectParams) = selectQuery.buildSql()
+
+
+    println("SQL: $selectSql")
+    println("Params: $selectParams")
+    println(executor.executeQuerySingle(selectSql, selectParams))
+
 
     orm.closeConnection()
 }
