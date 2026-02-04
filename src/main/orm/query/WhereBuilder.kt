@@ -3,7 +3,6 @@ package query
 import schema.Column
 
 class WhereBuilder {
-    // Comparison Operators
     infix fun <T> Column<T>.eq(value: T) = EqCondition(this, value)
     infix fun <T> Column<T>.notEq(value: T) = NotEqCondition(this, value)
     infix fun <T> Column<T>.greaterThan(value: T) = GreaterThanCondition(this, value)
@@ -11,28 +10,22 @@ class WhereBuilder {
     infix fun <T> Column<T>.lessThan(value: T) = LessThanCondition(this, value)
     infix fun <T> Column<T>.lessThanOrEq(value: T) = LessThanOrEqCondition(this, value)
 
-    // String Operators
     infix fun Column<String>.like(pattern: String) = LikeCondition(this, pattern)
     infix fun Column<String>.notLike(pattern: String) = NotLikeCondition(this, pattern)
 
-    // Collection Operators
     infix fun <T> Column<T>.inList(values: List<T>) = InCondition(this, values)
     infix fun <T> Column<T>.notInList(values: List<T>) = NotInCondition(this, values)
 
-    // NULL Checks
     fun <T> Column<T>.isNull() = IsNullCondition(this)
     fun <T> Column<T>.isNotNull() = IsNotNullCondition(this)
 
-    // Between
     fun <T> Column<T>.between(range: ClosedRange<T>): Condition where T : Comparable<T> {
         return BetweenCondition(this, range.start, range.endInclusive)
     }
 
-    // Logical Operators
     infix fun Condition.and(other: Condition) = AndCondition(this, other)
     infix fun Condition.or(other: Condition) = OrCondition(this, other)
     fun not(condition: Condition) = NotCondition(condition)
 
-    // Raw SQL
     fun raw(sql: String, vararg params: Any) = RawCondition(sql, params.toList())
 }

@@ -11,7 +11,6 @@ class UpdateQuery<T : Table>(
     private val updates = mutableMapOf<Column<*>, Any?>()
     private val conditions = mutableListOf<Condition>()
 
-    // SET clause
     fun set(builder: UpdateBuilder<T>.() -> Unit): UpdateQuery<T> {
         val updateBuilder = UpdateBuilder(table)
         updateBuilder.builder()
@@ -19,21 +18,18 @@ class UpdateQuery<T : Table>(
         return this
     }
 
-    // WHERE clause
     fun where(builder: WhereBuilder.() -> Condition): UpdateQuery<T> {
         val condition = WhereBuilder().builder()
         conditions.add(condition)
         return this
     }
 
-    // Execution
     fun execute(): Int {
         require(updates.isNotEmpty()) { "No updates specified" }
         val (sql, params) = buildSql()
         return executor.executeUpdate(sql, params)
     }
 
-    // SQL Building
     private fun buildSql(): Pair<String, List<Any?>> {
         val sql = buildString {
             append("UPDATE ${table.tableName} SET ")

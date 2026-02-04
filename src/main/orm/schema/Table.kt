@@ -65,13 +65,11 @@ abstract class Table(val tableName: String) {
             appendLine("=" .repeat(60))
             appendLine()
 
-            // Spalten
             appendLine("Columns:")
             columns.forEach { column ->
                 appendLine("  - ${column.toDetailString()}")
             }
 
-            // Table-Level Constraints
             if (tableConstraints.isNotEmpty()) {
                 appendLine()
                 appendLine("Table Constraints:")
@@ -88,7 +86,6 @@ fun Column<*>.toDetailString(): String {
         append(name)
         append(": ")
 
-        // Type
         when (this@toDetailString) {
             is IntegerColumn -> {
                 append("INTEGER")
@@ -98,10 +95,8 @@ fun Column<*>.toDetailString(): String {
             is TextColumn -> append(textType.name)
         }
 
-        // Nullable
         if (!this@toDetailString.nullable) append(" NOT NULL")
 
-        // Default
         if (this@toDetailString.defaultValue != null) {
             append(" DEFAULT ")
             when (this@toDetailString.defaultValue) {
@@ -110,7 +105,6 @@ fun Column<*>.toDetailString(): String {
             }
         }
 
-        // Constraints
         val constraintStrings = constraints.map { constraint ->
             when (constraint) {
                 is PrimaryKeyConstraint -> "PRIMARY KEY"
