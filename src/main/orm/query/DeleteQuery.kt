@@ -32,7 +32,7 @@ class DeleteQuery<T : Table>(
         return executor.executeUpdate(sql, params)
     }
 
-    private fun buildSql(): Pair<String, List<Any>> {
+    fun buildSql(): Pair<String, List<Any>> {
         val sql = buildString {
             append("DELETE FROM ${table.tableName}")
 

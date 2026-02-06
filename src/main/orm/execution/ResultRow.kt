@@ -6,7 +6,7 @@ import schema.Column
  * Repräsentiert eine Zeile aus dem ResultSet
  * ermöglicht typsicheren Zugriff auf Spalten-Werte
  */
-class ResultRow(private val data: Map<String, Any?>) {
+data class ResultRow(private val data: Map<String, Any?>) {
 
     operator fun <T> get(column: Column<T>): T {
         val value = data[column.name]

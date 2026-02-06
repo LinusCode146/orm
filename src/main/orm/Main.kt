@@ -1,6 +1,7 @@
 import core.Database
 import core.DatabaseConfiguration
 import execution.QueryExecutor
+import query.DeleteQuery
 import query.SelectQuery
 import schema.Table
 
@@ -12,7 +13,7 @@ fun main() {
         override val password: String = "npg_MIqDV6lkhGL9"
     })
 
-    val executor = QueryExecutor { orm.getConnection() }
+    val executor = QueryExecutor { orm.connection }
 
     val carsModel = object : Table("cars") {
         val id = integer("id").autoIncrement().primaryKey()
@@ -35,9 +36,9 @@ fun main() {
     println()
     println(carsModel)
 
-    val selectQuery = SelectQuery(carsModel, executor)
+    val selectQuery = DeleteQuery(carsModel, executor)
         .where { carsModel.id eq 1 }
-        .limit(1)
+
 
     val (selectSql, selectParams) = selectQuery.buildSql()
 
