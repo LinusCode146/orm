@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "2.3.0"
     `java-library`
+    id("com.gradleup.shadow") version "9.3.1"
 }
 
 group = "org.kotlin-orm"
@@ -36,4 +37,9 @@ sourceSets {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+// Shadow plugin configuration to create a .jar file with dependencies
+tasks.shadowJar {
+    archiveClassifier.set("bundled") // add -all postfix
 }
