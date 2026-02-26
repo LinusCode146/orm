@@ -14,6 +14,10 @@ abstract class Column<T> {
 
     abstract fun notNull(): Column<T>
     abstract fun nullable(): Column<T>
+
+    // we need to add these annotations here, since `default` is a keyword in Java
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("useDefault")
     abstract fun default(value: T): Column<T>
 
     fun primaryKey(constraintName: String? = null): Column<T> {

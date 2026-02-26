@@ -95,7 +95,7 @@ class SelectQuery<T : Table>(
         return executor.executeCount(countQuery, params)
     }
 
-    internal fun buildSql(): Pair<String, List<Any>> {
+    fun buildSql(): Pair<String, List<Any>> {
         val sql = buildString {
             append("SELECT ")
             if (distinctFlag) append("DISTINCT ")
