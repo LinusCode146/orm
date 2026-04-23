@@ -10,7 +10,6 @@ class InsertQuery<T : Table>(
     private val executor: QueryExecutor
 ) {
     private val valueSets = mutableListOf<Map<Column<*>, Any?>>()
-    private val returningColumns = mutableListOf<Column<*>>()
 
     fun values(builder: InsertBuilder<T>.() -> Unit): InsertQuery<T> {
         val insertBuilder = InsertBuilder(table)
@@ -28,22 +27,9 @@ class InsertQuery<T : Table>(
         return this
     }
 
-    fun returning(vararg columns: Column<*>): InsertQuery<T> {
-        returningColumns.addAll(columns)
-        return this
-    }
-
     fun execute(): Int {
         val (sql, params) = buildSql()
         return executor.executeUpdate(sql, params)
-    }
-
-    fun executeSingle(): ResultRow? {
-        require(returningColumns.isNotEmpty()) {
-            "executeSingle() requires RETURNING clause"
-        }
-        val (sql, params) = buildSql()
-        return executor.executeQuery(sql, params).firstOrNull()
     }
 
     private fun buildSql(): Pair<String, List<Any?>> {
@@ -60,11 +46,6 @@ class InsertQuery<T : Table>(
             append(valueSets.joinToString(", ") { valueSet ->
                 "(${columns.joinToString(", ") { "?" }})"
             })
-
-            if (returningColumns.isNotEmpty()) {
-                append(" RETURNING ")
-                append(returningColumns.joinToString(", ") { it.name })
-            }
         }
 
         val params = valueSets.flatMap { valueSet ->

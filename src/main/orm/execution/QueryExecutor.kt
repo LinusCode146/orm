@@ -52,24 +52,6 @@ class QueryExecutor(private val connectionProvider: () -> Connection) {
     }
 
     /**
-     * Führt INSERT mit RETURNING aus (PostgreSQL)
-     */
-    fun executeInsertReturning(sql: String, params: List<Any>): ResultRow? {
-        return useConnection { connection ->
-            connection.prepareStatement(sql).use { statement ->
-                bindParameters(statement, params)
-
-                val resultSet = statement.executeQuery()
-                if (resultSet.next()) {
-                    mapResultSetToRow(resultSet)
-                } else {
-                    null
-                }
-            }
-        }
-    }
-
-    /**
      * Führt INSERT aus und gibt generierte Keys zurück
      */
     fun executeInsertWithGeneratedKeys(sql: String, params: List<Any>): Long? {
