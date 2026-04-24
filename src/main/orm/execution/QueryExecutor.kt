@@ -158,8 +158,6 @@ class QueryExecutor(private val connectionProvider: () -> Connection) {
      * Helper für Connection Management
      */
     private fun <T> useConnection(block: (Connection) -> T): T {
-        return connectionProvider().use { connection ->
-            block(connection)
-        }
+        return block(connectionProvider())
     }
 }
