@@ -17,7 +17,6 @@ public class Queries {
         String url = "jdbc:postgresql://ep-lively-mode-ag9j92dh-pooler.c-2.eu-central-1.aws.neon.tech:5432/neondb?sslmode=require";
         String user = "neondb_owner";
         String password = "npg_MIqDV6lkhGL9";
-        int lehrerNr = ermittleLehrerNr(args);
 
         Database orm = new Database(new DatabaseConfiguration() {
             @Override
@@ -41,6 +40,7 @@ public class Queries {
 //            einfuegenBeispiele(executor);
 //            updateBeispiele(executor);
             selectBeispiele(executor);
+            int lehrerNr = ermittleLehrerNr(args);
             komplexeBeispieleOhneJoinSql(executor, lehrerNr);
         } finally {
             orm.closeConnection();
@@ -167,7 +167,7 @@ public class Queries {
                     .map(zeile -> zeile.getInt("tutor_lehrer_nr"))
                     .collect(Collectors.toSet());
 
-            List<ResultRow> mentoren = tutorLehrerIds.isEmpty()
+            List<ResultRow> tutoren = tutorLehrerIds.isEmpty()
                     ? List.of()
                     : new SelectQuery<>(CoreTables.LEHRER, executor)
                     .select(
@@ -180,7 +180,7 @@ public class Queries {
                     .orderBy(ExpressionKt.asc(CoreTables.LEHRER.name), ExpressionKt.asc(CoreTables.LEHRER.vorname))
                     .execute();
 
-            tabelleAusgeben("Lehrer als Mentoren von Schuelern mit Kursnote > 13", mentoren);
+            tabelleAusgeben("Lehrer als Mentoren von Schuelern mit Kursnote > 13", tutoren);
         }
 
         List<ResultRow> kurseVomLehrer = new SelectQuery<>(CoreTables.KURS, executor)
